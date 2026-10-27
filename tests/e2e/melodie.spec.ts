@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { melody, messages, steps } from '../../src/config'
 import { noteToMidi } from '../../src/game/pitch'
 import { expectSuccess, indexOf, openAt, playNote, startListening } from './helpers'
@@ -8,6 +8,7 @@ const notes = melody.events.map((event) => event.note)
 const step = steps[index]
 const failText = step.kind === 'melody' ? step.fail : ''
 const total = notes.length
+const victories = (page: Page) => page.evaluate(() => window.__chrono!.victories)
 
 test.beforeEach(async ({ page }) => {
   await page.clock.install()
@@ -32,10 +33,19 @@ test('mélodie réussie', async ({ page }) => {
   for (const [i, note] of notes.entries()) {
     await playNote(page, note)
     await expect(page.getByText(`Notes trouvées : ${i + 1} / ${total}`)).toBeVisible()
+    if (i < total - 1) expect(await victories(page)).toBe(0)
   }
   await expect(page.getByTestId('note').and(page.locator('[data-tone="green"]'))).toHaveCount(total)
+  await expect.poll(() => victories(page)).toBe(1) // musique de victoire
   await page.clock.runFor(1_000)
   await expectSuccess(page, index)
+  expect(await victories(page)).toBe(1)
+})
+
+test('la musique de victoire est bien publiée avec le site', async ({ page }) => {
+  const response = await page.request.get(melody.victorySound)
+  expect(response.ok()).toBe(true)
+  expect(response.headers()['content-type']).toContain('audio/mpeg')
 })
 
 test('mélodie ratée sur la 2e note : on recommence depuis la première', async ({ page }) => {
@@ -48,6 +58,7 @@ test('mélodie ratée sur la 2e note : on recommence depuis la première', async
 
   await page.clock.runFor(1_500)
   await expect(page.getByText(`Notes trouvées : 0 / ${total}`)).toBeVisible()
+  expect(await victories(page)).toBe(0)
   await expect(page.locator('[data-testid="note"][data-tone=""]')).toHaveCount(total)
 
   for (const note of notes) await playNote(page, note)

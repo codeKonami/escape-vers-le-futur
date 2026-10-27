@@ -16,6 +16,8 @@ export interface NoteSource {
 export interface MelodyPlayer {
   // Joue la mélodie ; la promesse se termine quand le son s'est éteint.
   play(): Promise<void>
+  // Joue la musique de victoire, quand la mélodie a été retrouvée au piano.
+  playVictory(): void
 }
 
 export interface Devices {
