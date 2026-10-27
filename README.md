@@ -47,16 +47,19 @@ Tout le paramétrage est dans ce seul fichier, commenté :
 | Prénoms des enfants (cartes sous les oreillers) | `kids` |
 | Textes, codes (2610, 1955), réponses acceptées, chiffres du coffre | `steps` |
 | Mots cachés dans les QR codes (`ROQUE`, `GLACON`) | `steps[…].token` |
-| Mélodie secrète et tempo | `melody` |
+| Mélodie secrète, tempo et musique de victoire | `melody` |
 | Durée et difficulté de la course | `race` |
 | Messages communs (QR trop tôt, caméra bloquée…) | `messages` |
 | Adresse du site, utilisée dans les QR codes imprimés | `productionUrl` |
 
 Le code du coffre (3912) n'est pas saisi à part : il assemble les `digit` des étapes, dans l'ordre.
 
-**La mélodie** reprend le format Tone.js : chaque événement est `{ time, note, duration }` (`"4n"` = noire, `"2n"` = blanche), et `bpm` règle le tempo.
-Les noms de notes (`G4`, `Bb4`…) sont les hauteurs attendues au micro, dans l'ordre. Les altérations comptent (un si n'est pas un si bémol).
+**La mélodie** reprend le format Tone.js : chaque événement est `{ time, note, duration, velocity }`.
+`time` se lit « mesure:temps:double-croche » (`"0:3:2"` = 4e temps de la 1re mesure, plus une croche) ; `duration` vaut `"2n"` (blanche), `"4n"` (noire), `"4n."` (noire pointée) ou `"8n"` (croche) ; `velocity` règle la force de la note (0 à 1) ; `bpm` règle le tempo.
+Les noms de notes (`C4`, `Bb4`…) sont les hauteurs attendues au micro, dans l'ordre. Les altérations comptent (un si n'est pas un si bémol).
 L'octave est ignorée, sauf si vous passez `octaveMatters` à `true`.
+
+**La musique de victoire** (`victorySound`) se lance quand les 4 notes sont retrouvées. C'est un fichier du dossier `public/` (aujourd'hui `public/song.mp3`) : pour en changer, déposez le nouveau fichier dans `public/` et mettez son nom dans `victorySound`.
 
 > Si vous changez un jeton de QR code ou l'adresse du site, réimprimez les cartes.
 
@@ -84,14 +87,14 @@ Suivez le déploiement dans l'onglet **Actions** du dépôt (environ 2 minutes).
 - [ ] Cacher le QR « Dernière pièce » sur la porte ou dans le réfrigérateur.
 - [ ] Cacher le coffre dans le sacacopo, son cadenas réglé sur le code du coffre (affiché dans l'espace parent).
 - [ ] Sur le Pixel 7, ouvrir le jeu et autoriser la caméra et le micro quand Chrome le demande.
-- [ ] Tester le micro près du piano : espace parent › aller à l'étape 5, puis bouton oreille, et jouer les 4 notes.
+- [ ] Tester le micro près du piano : espace parent › aller à l'étape 5, puis bouton oreille, et jouer les 4 notes. La musique de victoire doit se lancer.
 - [ ] Tester un scan : aller à l'étape 3 et scanner la carte de l'échiquier.
 - [ ] Remettre la partie à zéro : espace parent › « Recommencer la partie ».
 
 **Le matin**
 
 - [ ] Glisser la carte « Départ » (QR code) et la carte « Code secret » sous les oreillers indiqués sur les cartes.
-- [ ] Charger le téléphone, monter la luminosité, couper le mode silencieux pour entendre la mélodie.
+- [ ] Charger le téléphone, monter la luminosité, couper le mode silencieux pour entendre la mélodie et la musique de victoire.
 - [ ] Fermer l'onglet de l'espace parent (il affiche les solutions).
 
 **En cas de souci**
@@ -109,6 +112,8 @@ src/
   devices/        caméra (qr-scanner), micro (pitchy), son (Tone.js), et leurs doublures de test
   components/     en-tête, fenêtre de réussite, cadre de visée, illustrations SVG du design
   screens/        un écran par type d'étape, plus l'espace parent
+public/
+  song.mp3        musique de victoire de la mélodie
 tests/
   unit/           Vitest
   e2e/            Playwright (profil Pixel 7)

@@ -22,7 +22,7 @@ export const toneMelodyPlayer: MelodyPlayer = {
     transport.bpm.value = melody.bpm
 
     const part = new Tone.Part((time, event) => {
-      instrument.triggerAttackRelease(event.note, event.duration, time)
+      instrument.triggerAttackRelease(event.note, event.duration, time, event.velocity)
     }, melody.events).start(0)
 
     const end = Math.max(...melody.events.map((event) => Tone.Time(event.time).toSeconds() + Tone.Time(event.duration).toSeconds()))
@@ -36,5 +36,11 @@ export const toneMelodyPlayer: MelodyPlayer = {
     transport.cancel()
     transport.position = 0
     part.dispose()
+  },
+  playVictory() {
+    // Autorisé sans nouveau clic : les enfants ont déjà touché l'écran (bouton oreille).
+    new Audio(import.meta.env.BASE_URL + melody.victorySound).play().catch(() => {
+      // Son bloqué ou fichier absent : la réussite s'affiche quand même.
+    })
   },
 }

@@ -8,6 +8,7 @@ export type TestHooks = {
   scan(text: string): void // simule un QR code devant la caméra
   note(note: string | number): void // simule une note jouée au piano ("G4" ou numéro MIDI)
   plays: number // nombre de lectures de la mélodie
+  victories: number // nombre de lectures de la musique de victoire
   cameraOn: boolean
   micOn: boolean
   denyCamera: boolean
@@ -28,6 +29,7 @@ export function createTestDevices(): Devices {
     scan: (text) => onText?.(text),
     note: (note) => onNote?.(typeof note === 'number' ? note : noteToMidi(note)),
     plays: 0,
+    victories: 0,
     cameraOn: false,
     micOn: false,
     denyCamera: false,
@@ -65,6 +67,7 @@ export function createTestDevices(): Devices {
         hooks.plays++
         await new Promise((resolve) => setTimeout(resolve, 300))
       },
+      playVictory: () => hooks.victories++,
     },
     createRandom: () => hooks.random ?? seededRandom(42),
   }

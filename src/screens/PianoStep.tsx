@@ -47,6 +47,11 @@ export function PianoStep({ step, solved, onSolved }: { step: MelodyStep; solved
     }
   }, [state, onSolved])
 
+  // Les 4 notes sont retrouvées : musique de victoire (une seule fois).
+  useEffect(() => {
+    if (state.done) devices.melodyPlayer.playVictory()
+  }, [state.done])
+
   const play = async () => {
     if (playingRef.current) return
     playingRef.current = true

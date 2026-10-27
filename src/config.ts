@@ -163,22 +163,26 @@ export const steps: Step[] = [
 
 // -----------------------------------------------------------------------------
 // La mélodie secrète (étape « melody »).
-// Reprise à l'identique du Tone.Part d'origine : chaque événement a la forme
-// { time, note, duration } en notation Tone.js ("4n" = noire, "2n" = blanche).
+// Chaque événement a la forme { time, note, duration, velocity } en notation Tone.js :
+//   time     : "mesure:temps:double-croche" ("0:3:2" = 4e temps de la 1re mesure + une croche)
+//   duration : "2n" = blanche, "4n" = noire, "4n." = noire pointée, "8n" = croche
+//   velocity : force de la note, de 0 à 1
 // Les noms de notes donnent, dans l'ordre, les hauteurs attendues au micro.
-// Les positions, durées et le tempo ne servent qu'à la lecture (bouton Écouter).
+// Les positions, durées, forces et le tempo ne servent qu'à la lecture (bouton Écouter).
 // -----------------------------------------------------------------------------
 export const melody = {
   bpm: 120,
   events: [
-    { time: 0, note: 'G4', duration: '4n' },
-    { time: '4n', note: 'B4', duration: '4n' },
-    { time: '2n', note: 'C5', duration: '4n' },
-    { time: '2n + 4n', note: 'Bb4', duration: '2n' }, // blanche
+    { time: '0:0:0', note: 'C4', duration: '2n', velocity: 0.6 }, // blanche
+    { time: '0:2:0', note: 'G4', duration: '4n.', velocity: 0.6 }, // noire pointée
+    { time: '0:3:2', note: 'C5', duration: '8n', velocity: 0.6 }, // croche
+    { time: '1:0:0', note: 'Bb4', duration: '4n.', velocity: 0.6 }, // noire pointée
   ],
-  // false : un sol grave ou un sol aigu valent tous les deux « sol ».
+  // false : un do grave ou un do aigu valent tous les deux « do ».
   // true  : il faut jouer la note à la bonne octave.
   octaveMatters: false,
+  // Musique jouée quand les 4 notes sont retrouvées : un fichier du dossier public/.
+  victorySound: 'song.mp3',
 }
 
 // -----------------------------------------------------------------------------
